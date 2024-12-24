@@ -5,25 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secret Santa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/7/7b/Santa_Claus.png" type="image/png">
     <style>
-        body {
-            background: url('https://source.unsplash.com/1600x900/?christmas') no-repeat center center fixed;
+         body {
+            background: url('https://source.unsplash.com/1600x900/?santa,christmas') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             color: #ffffff;
+            overflow-x: hidden;
         }
-        .countdown {
-            font-size: 2rem;
-            color: #ff0000;
-        }
-        .profile {
-            text-align: center;
-            margin: 20px auto;
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .profile img {
             border-radius: 50%;
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 10px;
         }
         .attendees img {
             border-radius: 50%;
@@ -32,10 +35,24 @@
             height: 60px;
             border: 2px solid #fff;
         }
-        .container {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 20px;
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .text-center h1, .text-center h3 {
+            color: #d63384;
+            font-weight: bold;
+        }
+        label {
+            color: #495057;
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border: 1px solid #ced4da;
+            border-radius: 5px;
         }
         .snowflake {
             position: absolute;
@@ -49,6 +66,11 @@
             to {
                 transform: translateY(100vh);
             }
+        }
+        .countdown {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -71,7 +93,7 @@
         </div>
 
         <div class="text-center mt-5">
-            <h3>List of Attendees</h3>
+            <h3>List of Invitees</h3>
             <div id="attendees" class="attendees">
                 <!-- Attendee profiles will be dynamically inserted here -->
             </div>
