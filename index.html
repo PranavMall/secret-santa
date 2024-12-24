@@ -177,21 +177,62 @@
         }
 
         // Load attendees
+  // Load attendees
         const attendeesDiv = document.getElementById('attendees');
+        const rsvpCountElem = document.createElement('p');
+        attendeesDiv.appendChild(rsvpCountElem);
 
-        database.ref('attendees').on('value', snapshot => {
-            attendeesDiv.innerHTML = '';
-            snapshot.forEach(childSnapshot => {
-                const attendee = childSnapshot.val();
-                const img = document.createElement('img');
-                img.src = attendee.img || "https://via.placeholder.com/100";
-                img.alt = attendee.name;
-                img.title = attendee.name;
-                attendeesDiv.appendChild(img);
+        function fetchAttendees() {
+            const attendeesRef = database.ref('attendees');
+
+            onValue(attendeesRef, (snapshot) => {
+                const attendeesData = snapshot.val();
+                attendeesDiv.innerHTML = ''; // Clear the previous list
+                let rsvpCount = 0;
+
+                if (attendeesData) {
+                    for (const key in attendeesData) {
+                        if (attendeesData[key].rsvp) { // Check RSVP status
+                            rsvpCount++;
+
+                            // Create attendee element
+                            const attendeeElem = document.createElement('div');
+                            attendeeElem.classList.add('attendee');
+
+                            const img = document.createElement('img');
+                            img.src = attendeesData[key].img || 'https://via.placeholder.com/60';
+                            img.alt = attendeesData[key].name || 'Attendee';
+
+                            const nameElem = document.createElement('p');
+                            nameElem.innerText = attendeesData[key].name || 'Anonymous';
+                            nameElem.style.margin = '5px 0';
+                            nameElem.style.color = '#fff';
+                            nameElem.style.textAlign = 'center';
+
+                            attendeeElem.appendChild(img);
+                            attendeeElem.appendChild(nameElem);
+                            attendeesDiv.appendChild(attendeeElem);
+                        }
+                    }
+                }
+
+                rsvpCountElem.innerText = `${rsvpCount} people have RSVP'd Yes.`;
+            }, (error) => {
+                console.error('Error fetching attendees:', error);
             });
-        }, error => {
-            console.error("Error fetching attendees:", error);
+        }
+
+        // Fetch user profile and attendees list on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (userCode) {
+                fetchUserProfile();
+            } else {
+                alert('Invite code missing. Please use a valid invite link.');
+            }
+            fetchAttendees();
         });
     </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </body>
 </html>
