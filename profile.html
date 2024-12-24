@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: url('https://source.unsplash.com/1600x900/?christmas-snow') no-repeat center center fixed;
+            background: url('https://source.unsplash.com/1600x900/?santa,christmas') no-repeat center center fixed;
             background-size: cover;
             font-family: Arial, sans-serif;
             color: #ffffff;
@@ -110,10 +110,11 @@
 
     <!-- Falling Snowflakes -->
     <script>
+const icons = ['❄', '🎄', '🍪', '🎅', '⛄'];
         for (let i = 0; i < 50; i++) {
             const snowflake = document.createElement('div');
             snowflake.classList.add('snowflake');
-            snowflake.textContent = '❄';
+            snowflake.textContent = icons[Math.floor(Math.random() * icons.length)];
             snowflake.style.left = Math.random() * window.innerWidth + 'px';
             snowflake.style.animationDelay = Math.random() * 10 + 's';
             snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
@@ -191,24 +192,52 @@
             const rsvpCountElem = document.getElementById('rsvpCount');
             const attendeesRef = ref(database, 'attendees');
 
-            onValue(attendeesRef, (snapshot) => {
-                attendeesDiv.innerHTML = ''; // Clear current attendees
-                snapshot.forEach(childSnapshot => {
-                    const attendee = childSnapshot.val();
-                    if (attendee.rsvp) {
-                        const img = document.createElement('img');
-                        img.src = attendee.img;
-                        img.alt = attendee.name;
-                        img.title = attendee.name;
-                        attendeesDiv.appendChild(img);
+                       onValue(attendeesRef, (snapshot) => {
+                const attendeesData = snapshot.val();
+                attendeesDiv.innerHTML = ''; // Clear the previous list
+                let rsvpCount = 0;
+
+                if (attendeesData) {
+                    for (const key in attendeesData) {
+                        if (attendeesData[key].rsvp) { // Check RSVP status
+                            rsvpCount++;
+
+                            // Create attendee element
+                            const attendeeElem = document.createElement('div');
+                            attendeeElem.classList.add('attendee');
+
+                            const img = document.createElement('img');
+                            img.src = attendeesData[key].img || 'https://via.placeholder.com/60';
+                            img.alt = attendeesData[key].name || 'Attendee';
+
+                            const nameElem = document.createElement('p');
+                            nameElem.innerText = attendeesData[key].name || 'Anonymous';
+                            nameElem.style.margin = '5px 0';
+                            nameElem.style.color = '#fff';
+                            nameElem.style.textAlign = 'center';
+
+                            attendeeElem.appendChild(img);
+                            attendeeElem.appendChild(nameElem);
+                            attendeesDiv.appendChild(attendeeElem);
+                        }
                     }
-                });
+                }
+
+                rsvpCountElem.innerText = `${rsvpCount} people have RSVP'd Yes.`;
             }, (error) => {
                 console.error('Error fetching attendees:', error);
             });
         }
 
-        // Fetch data on page load
-        fetchUserProfile();
-        fetchAttendees();
+        // Fetch user profile and attendees list on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (userCode) {
+                fetchUserProfile();
+            } else {
+                alert('Invite code missing. Please use a valid invite link.');
+            }
+            fetchAttendees();
+        });
     </script>
+</body>
+</html>
