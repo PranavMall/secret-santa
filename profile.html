@@ -144,11 +144,11 @@
         const userCode = urlParams.get('code');
 
         function fetchUserProfile() {
-            const userRef = ref(database, 'invitees/' + userCode);
+            const userRef = ref(database, 'attendees/' + userCode);
             onValue(userRef, (snapshot) => {
                 const userData = snapshot.val();
                 if (userData) {
-                    document.getElementById('profileImg').src = userData.img || "https://via.placeholder.com/120";
+                    document.getElementById('profileImg').src = userData.img;
                     document.getElementById('profileName').innerText = userData.name || "Anonymous";
                     document.getElementById('mealPreference').value = userData.meal || "";
                     document.getElementById('likes').value = userData.likes || "";
