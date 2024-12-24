@@ -71,10 +71,22 @@
       justify-content: center;
     }
 
-    @media (max-width: 767px) {
-      .attendee-card {
-        max-width: 80px;
-      }
+    /* Mobile adjustments */
+@media (max-width: 767px) {
+  .attendee-card {
+    max-width: 80px;
+  }
+
+  .profile-section img {
+    
+  }
+}
+
+/* Smooth scrolling to the profile section */
+html {
+  scroll-behavior: smooth;
+}
+
     }
   </style>
 </head>
@@ -172,29 +184,38 @@
       });
     }
 
-    // Function to show profile details
-    function showProfile(attendee) {
-      const profileSection = document.getElementById('profile-section');
-      document.getElementById('profile-name').innerText = attendee.name;
-      document.getElementById('profile-img').src = attendee.img || 'https://via.placeholder.com/150';
+// Function to show profile details
+function showProfile(attendee) {
+  const profileSection = document.getElementById('profile-section');
+  document.getElementById('profile-name').innerText = attendee.name;
+  document.getElementById('profile-img').src = attendee.img || 'https://via.placeholder.com/150';
 
-      // Check if details are missing, show 'Awaiting Confirmation'
-      const likes = attendee.likes || 'Awaiting Confirmation';
-      const dislikes = attendee.dislikes || 'Awaiting Confirmation';
-      const meal = attendee.meal || 'Awaiting Confirmation';
-      const spouse = attendee.spouse || 'Awaiting Confirmation';
-      const notes = attendee.notes || 'Awaiting Confirmation';
+  // Check if details are missing, show 'Awaiting Confirmation'
+  const details = attendee.likes && attendee.dislikes && attendee.meal && attendee.spouse && attendee.notes
+    ? `Likes: ${attendee.likes}, Dislikes: ${attendee.dislikes}, Meal: ${attendee.meal}, Spouse: ${attendee.spouse}, Notes: ${attendee.notes}`
+    : 'Awaiting Confirmation';
 
-      // Populate profile details
-      document.getElementById('profile-likes').innerText = likes;
-      document.getElementById('profile-dislikes').innerText = dislikes;
-      document.getElementById('profile-meal').innerText = meal;
-      document.getElementById('profile-spouse').innerText = spouse;
-      document.getElementById('profile-notes').innerText = notes;
+  // Populate profile details
+  document.getElementById('profile-likes').innerText = attendee.likes || 'Awaiting Confirmation';
+  document.getElementById('profile-dislikes').innerText = attendee.dislikes || 'Awaiting Confirmation';
+  document.getElementById('profile-meal').innerText = attendee.meal || 'Awaiting Confirmation';
+  document.getElementById('profile-spouse').innerText = attendee.spouse || 'Awaiting Confirmation';
+  document.getElementById('profile-notes').innerText = attendee.notes || 'Awaiting Confirmation';
 
-      // Display profile section
-      profileSection.style.display = 'block';
-    }
+  // Display profile section
+  profileSection.style.display = 'block';
+
+  // Smooth Scroll to the profile section
+  profileSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Adjust image size for mobile screens (smaller images)
+document.querySelectorAll('.attendee-card img').forEach((img) => {
+  if (window.innerWidth <= 767) {
+    img.style.maxWidth = '80px'; // Smaller images for mobile
+  }
+});
+
 
     // Call function to load attendees on page load
     loadAttendees();
