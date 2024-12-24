@@ -112,6 +112,12 @@
                 <!-- Attendee profiles will be dynamically inserted here -->
             </div>
         </div>
+                <div class="text-center mt-5">
+            <h3>List of Attendees</h3>
+            <div id="rsvp" class="rsvp">
+                <!-- Attendee profiles will be dynamically inserted here -->
+            </div>
+        </div>
     </div>
     <!-- Falling Snowflakes -->
     <script>
@@ -192,15 +198,20 @@
 
         // Load attendees
         const attendeesDiv = document.getElementById('attendees');
+         const rsvpDiv = document.getElementById('rsvp');
         const rsvpCountElem = document.createElement('p');
         attendeesDiv.appendChild(rsvpCountElem);
+        rsvpDiv.appendChild(rsvpCountElem);
 
         function fetchAttendees() {
             const attendeesRef = database.ref('attendees');
+            const rsvpRef = database.ref('attendees');
 
             attendeesRef.on('value', (snapshot) => {
                 const attendeesData = snapshot.val();
+                const rsvpData = snapshot.val();
                 attendeesDiv.innerHTML = ''; // Clear the previous list
+                rsvpDiv.innerHTML = ''; // Clear the previous list
                 let rsvpCount = 0;
 
                 if (attendeesData) {
@@ -223,6 +234,29 @@
                             attendeeElem.appendChild(nameElem);
                             attendeesDiv.appendChild(attendeeElem);
                         // }
+                    }
+                }
+                
+                if (rsvpData) {
+                    for (const key in attendeesData) {
+                        if (rsvpData[key].rsvp) { // Check RSVP status
+                            rsvpCount++;
+
+                            // Create attendee element
+                            const rsvpElem = document.createElement('div');
+                            rsvpElem.classList.add('attendee');
+
+                            const rsvpimg = document.createElement('img');
+                            img.src = rsvpData[key].img || 'https://via.placeholder.com/60';
+                            img.alt = rsvpData[key].name || 'Attendee';
+
+                            const rsvpnameElem = document.createElement('p');
+                            nameElem.innerText = rsvpData[key].name || 'Anonymous';
+
+                            rsvpElem.appendChild(rsvpimg);
+                            rsvpElem.appendChild(rsvpnameElem);
+                            rsvpDiv.appendChild(rsvpElem);
+                        }
                     }
                 }
 
