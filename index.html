@@ -205,8 +205,8 @@
 
                 if (attendeesData) {
                     for (const key in attendeesData) {
-                        if (attendeesData[key].rsvp) { // Check RSVP status
-                            rsvpCount++;
+                        // if (attendeesData[key].rsvp) { // Check RSVP status
+                        //     rsvpCount++;
 
                             // Create attendee element
                             const attendeeElem = document.createElement('div');
@@ -222,7 +222,7 @@
                             attendeeElem.appendChild(img);
                             attendeeElem.appendChild(nameElem);
                             attendeesDiv.appendChild(attendeeElem);
-                        }
+                        // }
                     }
                 }
 
