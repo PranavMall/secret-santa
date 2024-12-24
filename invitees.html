@@ -89,25 +89,25 @@
       <!-- Attendee Cards will be populated here by JavaScript -->
     </div>
 
-<div class="profile-section" id="profile-section">
-  <div class="row">
-    <!-- Left Side: Details -->
-    <div class="col-md-8">
-      <h3 id="profile-name">Name</h3>
-      <p><strong>Likes:</strong> <span id="profile-likes"></span></p>
-      <p><strong>Dislikes:</strong> <span id="profile-dislikes"></span></p>
-      <p><strong>Meal Preference:</strong> <span id="profile-meal"></span></p>
-      <p><strong>Spouse:</strong> <span id="profile-spouse"></span></p>
-      <p><strong>Notes:</strong> <span id="profile-notes"></span></p>
-    </div>
+    <div class="profile-section" id="profile-section">
+      <div class="row">
+        <!-- Left Side: Details -->
+        <div class="col-md-8">
+          <h3 id="profile-name">Name</h3>
+          <p><strong>Likes:</strong> <span id="profile-likes"></span></p>
+          <p><strong>Dislikes:</strong> <span id="profile-dislikes"></span></p>
+          <p><strong>Meal Preference:</strong> <span id="profile-meal"></span></p>
+          <p><strong>Spouse:</strong> <span id="profile-spouse"></span></p>
+          <p><strong>Notes:</strong> <span id="profile-notes"></span></p>
+        </div>
 
-    <!-- Right Side: Image -->
-    <div class="col-md-4 text-center">
-      <img id="profile-img" src="" alt="Profile Picture" class="img-fluid rounded-circle">
+        <!-- Right Side: Image -->
+        <div class="col-md-4 text-center">
+          <img id="profile-img" src="" alt="Profile Picture" class="img-fluid rounded-circle">
+        </div>
+      </div>
     </div>
   </div>
-</div>
-
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
@@ -120,12 +120,12 @@
     // Firebase configuration (replace with your own Firebase project config)
     const firebaseConfig = {
       apiKey: "AIzaSyCGqKKjAnjluEQoNKfPyzdBSM_vIoUyiQ0",
-            authDomain: "secret-santa-608ec.firebaseapp.com",
-            databaseURL: "https://secret-santa-608ec-default-rtdb.firebaseio.com",
-            projectId: "secret-santa-608ec",
-            storageBucket: "secret-santa-608ec.appspot.com",
-            messagingSenderId: "786834897253",
-            appId: "1:786834897253:web:c42ccca6598739af44c98c"
+      authDomain: "secret-santa-608ec.firebaseapp.com",
+      databaseURL: "https://secret-santa-608ec-default-rtdb.firebaseio.com",
+      projectId: "secret-santa-608ec",
+      storageBucket: "secret-santa-608ec.appspot.com",
+      messagingSenderId: "786834897253",
+      appId: "1:786834897253:web:c42ccca6598739af44c98c"
     };
 
     // Import Firebase and initialize it
@@ -173,25 +173,27 @@
     }
 
     // Function to show profile details
-    function showProfile(attendee) 
-    const profileSection = document.getElementById('profile-section');
-    document.getElementById('profile-name').innerText = attendee.name;
-    document.getElementById('profile-img').src = attendee.img || 'https://via.placeholder.com/150';
+    function showProfile(attendee) {
+      const profileSection = document.getElementById('profile-section');
+      document.getElementById('profile-name').innerText = attendee.name;
+      document.getElementById('profile-img').src = attendee.img || 'https://via.placeholder.com/150';
 
       // Check if details are missing, show 'Awaiting Confirmation'
-      const details = attendee.likes && attendee.dislikes && attendee.meal && attendee.spouse && attendee.notes
-        ? `Likes: ${attendee.likes}, Dislikes: ${attendee.dislikes}, Meal: ${attendee.meal}, Spouse: ${attendee.spouse}, Notes: ${attendee.notes}`
-        : 'Awaiting Confirmation';
-    // Populate profile details
-    document.getElementById('profile-likes').innerText = likes;
-  document.getElementById('profile-dislikes').innerText = dislikes;
-  document.getElementById('profile-meal').innerText = meal;
-  document.getElementById('profile-spouse').innerText = spouse;
-  document.getElementById('profile-notes').innerText = notes;
+      const likes = attendee.likes || 'Awaiting Confirmation';
+      const dislikes = attendee.dislikes || 'Awaiting Confirmation';
+      const meal = attendee.meal || 'Awaiting Confirmation';
+      const spouse = attendee.spouse || 'Awaiting Confirmation';
+      const notes = attendee.notes || 'Awaiting Confirmation';
 
-  // Display profile section
-  profileSection.style.display = 'block';
-    
+      // Populate profile details
+      document.getElementById('profile-likes').innerText = likes;
+      document.getElementById('profile-dislikes').innerText = dislikes;
+      document.getElementById('profile-meal').innerText = meal;
+      document.getElementById('profile-spouse').innerText = spouse;
+      document.getElementById('profile-notes').innerText = notes;
+
+      // Display profile section
+      profileSection.style.display = 'block';
     }
 
     // Call function to load attendees on page load
