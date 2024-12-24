@@ -64,6 +64,18 @@
             </div>
         </div>
     </div>
+    <!-- Falling Snowflakes -->
+    <script>
+        for (let i = 0; i < 50; i++) {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.textContent = '❄';
+            snowflake.style.left = Math.random() * window.innerWidth + 'px';
+            snowflake.style.animationDelay = Math.random() * 10 + 's';
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            document.body.appendChild(snowflake);
+        }
+    </script>
 
     <!-- Load Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -117,7 +129,7 @@
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const attendee = snapshot.val();
-                        alert(`Welcome, ${attendee.name}!`);
+                        // alert(`Welcome, ${attendee.name}!`);
                         window.location.href = `profile.html?code=${uniqueCode}`;
                     } else {
                         alert("Invalid code. Please try again.");
