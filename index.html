@@ -37,6 +37,19 @@
             border-radius: 15px;
             padding: 20px;
         }
+        .snowflake {
+            position: absolute;
+            top: -50px;
+            color: #fff;
+            font-size: 1.5em;
+            pointer-events: none;
+            animation: fall 10s linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
     </style>
 </head>
 <body>
