@@ -54,8 +54,8 @@
         </div>
 
         <div class="text-center profile">
-            <img id="profileImg" src="https://via.placeholder.com/120" alt="Profile Image">
-            <h3 id="profileName">John Doe</h3>
+            <img id="profileImg">
+            <h3 id="profileName"></h3>
         </div>
 
         <form id="profileForm">
@@ -144,7 +144,7 @@
         const userCode = urlParams.get('code');
 
         function fetchUserProfile() {
-            const userRef = ref(database, 'attendees/' + userCode);
+            const userRef = ref(database, 'invitees/' + userCode);
             onValue(userRef, (snapshot) => {
                 const userData = snapshot.val();
                 if (userData) {
