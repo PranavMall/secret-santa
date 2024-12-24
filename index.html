@@ -138,7 +138,7 @@
         function validateCode() {
             const uniqueCode = document.getElementById('uniqueCode').value;
 
-            database.ref(`attendees/${uniqueCode}`).once('value')
+            database.ref(`invitees/${uniqueCode}`).once('value')
                 .then(snapshot => {
                     if (snapshot.exists()) {
                         const attendee = snapshot.val();
