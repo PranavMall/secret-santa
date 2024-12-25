@@ -360,7 +360,7 @@ window.drawSecretSanta = function() {
     const attendeesRef = ref(database, 'attendees');
     const userRef = ref(database, 'attendees/' + userCode);
 
-    // Simple animation setup
+    // Animation setup
     const animationContainer = document.getElementById('animationContainer');
     const nameDisplay = document.createElement('div');
     nameDisplay.className = 'drawing-animation';
@@ -374,13 +374,21 @@ window.drawSecretSanta = function() {
             throw new Error('User not found');
         }
 
-        // Get spouse's ID and details
+        // Get spouse's ID
         const spouseId = currentUser.spouse;
         
         return get(attendeesRef).then((snapshot) => {
             const attendees = snapshot.val();
             
-            // Filter available names with proper spouse exclusion
+            // Create a map of who is giving gifts to whom
+            const giftAssignments = new Map();
+            Object.entries(attendees).forEach(([key, value]) => {
+                if (value.giftTo) {
+                    giftAssignments.set(key, value.giftTo);
+                }
+            });
+
+            // Filter available names with enhanced exclusion logic
             const availableNames = Object.entries(attendees || {}).filter(([key, value]) => {
                 // Exclude self
                 if (key === userCode) return false;
@@ -393,6 +401,20 @@ window.drawSecretSanta = function() {
                 
                 // Only include people who RSVP'd yes
                 if (!value.rsvp) return false;
+
+                // Check if this person is already receiving a gift
+                const isAlreadyReceivingGift = Array.from(giftAssignments.values()).includes(key);
+                if (isAlreadyReceivingGift) return false;
+                
+                // Prevent cycles in gift-giving
+                let currentGiver = key;
+                const visited = new Set();
+                while (giftAssignments.has(currentGiver)) {
+                    if (visited.has(currentGiver)) return false;
+                    visited.add(currentGiver);
+                    currentGiver = giftAssignments.get(currentGiver);
+                    if (currentGiver === userCode) return false; // Would create a cycle
+                }
                 
                 return true;
             });
@@ -406,7 +428,7 @@ window.drawSecretSanta = function() {
             // Randomly select name
             const [drawnKey, drawnUser] = availableNames[Math.floor(Math.random() * availableNames.length)];
 
-            // Simple animation
+            // Animation logic
             let dots = '';
             const loadingInterval = setInterval(() => {
                 dots = dots.length >= 3 ? '' : dots + '.';
@@ -420,7 +442,7 @@ window.drawSecretSanta = function() {
                 [`attendees/${userCode}/timestamp_drawn`]: new Date().toISOString()
             };
 
-            // Wait a bit for animation effect
+            // Wait for animation
             setTimeout(() => {
                 clearInterval(loadingInterval);
                 
