@@ -48,119 +48,53 @@
         }
 
         /* Name Drawing Animation Styles */
-        .name-drawing-container {
-            min-height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            position: relative;
-            overflow: hidden;
-        }
+.drawing-animation {
+    font-size: 24px;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    animation: pulse 1s infinite;
+}
 
-        .animation-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            height: 150px;
-        }
+.drawn-name {
+    font-size: 32px;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    animation: popIn 0.5s ease-out;
+}
 
-        .animation-name {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.3s ease;
-        }
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
 
-        .animation-name.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+@keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
 
-        .drawn-name {
-            font-size: 2em;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            animation: popIn 0.5s ease-out forwards;
-        }
+.result-message {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    animation: fadeIn 0.5s ease-out;
+}
 
-        @keyframes popIn {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
-        .santa-count {
-            font-size: 1.2em;
-            color: #fff;
-            text-align: center;
-            margin: 20px 0;
-            padding: 10px;
-            background: rgba(255, 0, 0, 0.2);
-            border-radius: 10px;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .draw-button {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .draw-button:hover {
-            background: #ff6666;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .draw-button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .result-message {
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+#santaCount {
+    margin-top: 20px;
+    font-size: 18px;
+    color: white;
+    display: none;  /* Hide initially */
+}
     </style>
 </head>
 <body>
@@ -250,8 +184,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getDatabase, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-
+        import { getDatabase, ref, set, update, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+        
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCGqKKjAnjluEQoNKfPyzdBSM_vIoUyiQ0",
@@ -309,27 +243,29 @@
 
         // Profile functions
         function fetchUserProfile() {
-            const userRef = ref(database, 'attendees/' + userCode);
-            onValue(userRef, (snapshot) => {
-                const userData = snapshot.val();
-                if (userData) {
-                    document.getElementById('profileImg').src = userData.img;
-                    document.getElementById('profileName').innerText = userData.name || "Anonymous";
-                    document.getElementById('mealPreference').value = userData.meal || "";
-                    document.getElementById('likes').value = userData.likes || "";
-                    document.getElementById('dislikes').value = userData.dislikes || "";
-                    document.getElementById('notes').value = userData.notes || "";
-                    document.getElementById(userData.rsvp ? 'rsvpYes' : 'rsvpNo').checked = true;
-                    
-                    // If user has already drawn a name, disable the draw button and show the name
-                    if (userData.giftTo) {
-                        document.getElementById('drawButton').disabled = true;
-                        document.getElementById('secretSantaInfo').innerHTML = 
-                            `<div class="result-message">You will be giving a gift to: <strong>${userData.santa}</strong></div>`;
-                    }
-                }
-            });
+    const userRef = ref(database, 'attendees/' + userCode);
+    
+    // Use get() instead of onValue to prevent continuous updates
+    get(userRef).then((snapshot) => {
+        const userData = snapshot.val();
+        if (userData) {
+            document.getElementById('profileImg').src = userData.img || '';
+            document.getElementById('profileName').innerText = userData.name || "Anonymous";
+            document.getElementById('mealPreference').value = userData.meal || "";
+            document.getElementById('likes').value = userData.likes || "";
+            document.getElementById('dislikes').value = userData.dislikes || "";
+            document.getElementById('notes').value = userData.notes || "";
+            document.getElementById(userData.rsvp ? 'rsvpYes' : 'rsvpNo').checked = true;
+            
+            // Show drawn name if exists
+            if (userData.giftTo) {
+                document.getElementById('drawButton').disabled = true;
+                document.getElementById('secretSantaInfo').innerHTML = 
+                    `<div class="result-message">You will be giving a gift to: <strong>${userData.santa}</strong></div>`;
+            }
         }
+    });
+}
 
         window.updateProfile = function() {
             const meal = document.getElementById('mealPreference').value;
@@ -356,124 +292,135 @@
                 });
         }
 
-        window.drawSecretSanta = function() {
-            const attendeesRef = ref(database, 'attendees');
-            const userRef = ref(database, 'attendees/' + userCode);
+// Add this to your existing Firebase script section
+window.drawSecretSanta = function() {
+    const drawButton = document.getElementById('drawButton');
+    if (drawButton.disabled) return;
+    drawButton.disabled = true;
 
-            // Fetch current user's details for spouse exclusion
-            onValue(userRef, (userSnapshot) => {
-                const currentUser = userSnapshot.val();
-                const spouseId = currentUser ? currentUser.spouse : null;
+    const attendeesRef = ref(database, 'attendees');
+    const userRef = ref(database, 'attendees/' + userCode);
 
-                // Fetch all attendees
-                onValue(attendeesRef, (snapshot) => {
-                    const attendees = snapshot.val();
+    // Simple animation setup
+    const animationContainer = document.getElementById('animationContainer');
+    const nameDisplay = document.createElement('div');
+    nameDisplay.className = 'drawing-animation';
+    animationContainer.innerHTML = '';
+    animationContainer.appendChild(nameDisplay);
 
-                    // Filter out current user, spouse, and already drawn names
-                    const availableNames = Object.entries(attendees || {}).filter(([key, value]) => 
-                        key !== userCode && 
-                        key !== spouseId && 
-                        !value.giftTo
-                    );
+    // Get data once instead of using onValue to prevent multiple listeners
+    get(userRef).then((userSnapshot) => {
+        const currentUser = userSnapshot.val();
+        const spouseId = currentUser?.spouse;
 
-                    if (availableNames.length === 0) {
-                        alert("No names available to draw.");
-                        return;
-                    }
+        return get(attendeesRef).then((snapshot) => {
+            const attendees = snapshot.val();
+            
+            // Filter available names
+            const availableNames = Object.entries(attendees || {}).filter(([key, value]) => 
+                key !== userCode && 
+                key !== spouseId && 
+                !value.giftTo &&
+                value.rsvp // Only include people who RSVP'd yes
+            );
 
-                    // Get random names for animation
-                    const allNames = Object.values(attendees).map(a => a.name);
-                    const animationNames = Array(5).fill(null).map(() => 
-                        allNames[Math.floor(Math.random() * allNames.length)]
-                    );
+            if (availableNames.length === 0) {
+                drawButton.disabled = false;
+                alert("No names available to draw.");
+                return;
+            }
 
-                    // Randomly select final name
-                    const [drawnKey, drawnUser] = availableNames[Math.floor(Math.random() * availableNames.length)];
+            // Randomly select name
+            const [drawnKey, drawnUser] = availableNames[Math.floor(Math.random() * availableNames.length)];
 
-                    // Start animation
-                    animateNameDrawing(animationNames, drawnUser.name);
+            // Simple animation
+            let dots = '';
+            const loadingInterval = setInterval(() => {
+                dots = dots.length >= 3 ? '' : dots + '.';
+                nameDisplay.textContent = `Drawing your Secret Santa${dots}`;
+            }, 300);
 
-                    // Update database with drawn name
-                    const updates = {};
-                    updates[`attendees/${userCode}/giftTo`] = drawnKey;
-                    updates[`attendees/${userCode}/santa`] = drawnUser.name;
+            // Update database
+            const updates = {
+                [`attendees/${userCode}/giftTo`]: drawnKey,
+                [`attendees/${userCode}/santa`]: drawnUser.name
+            };
 
-                    // Update database and show result
-                    update(ref(database), updates)
-                        .then(() => {
-                            // Count total Santas who have drawn names
-                            const santaCount = Object.values(attendees).filter(a => a.giftTo).length + 1;
+            // Wait a bit for animation effect
+            setTimeout(() => {
+                clearInterval(loadingInterval);
+                
+                update(ref(database), updates)
+                    .then(() => {
+                        // Count Santas
+                        const santaCount = Object.values(attendees)
+                            .filter(a => a.giftTo && a.rsvp).length + 1;
+
+                        // Update UI
+                        nameDisplay.textContent = drawnUser.name;
+                        nameDisplay.className = 'drawn-name';
+                        
+                        document.getElementById('santaCount').textContent = 
+                            `${santaCount} Secret Santa${santaCount !== 1 ? 's are' : ' is'} preparing their gift! 🎁`;
                             
-                            // Update the Santa count display
-                            document.getElementById('santaCount').innerHTML = 
-                                `<div class="santa-count">${santaCount} Secret Santas are preparing their gifts! 🎁</div>`;
-                            
-                            // Show final result after animation completes
-                            setTimeout(() => {
-                                document.getElementById('secretSantaInfo').innerHTML = 
-                                    `<div class="result-message">
-                                        You will be giving a gift to: <strong>${drawnUser.name}</strong>
-                                     </div>`;
-                                document.getElementById('drawButton').disabled = true;
-                            }, 2000);
-                        })
-                        .catch((error) => {
-                            console.error('Error saving drawn name:', error);
-                            alert('Error drawing name. Please try again.');
-                        });
-                });
-            });
-        }
+                        document.getElementById('secretSantaInfo').innerHTML = 
+                            `<div class="result-message">
+                                You will be giving a gift to: <strong>${drawnUser.name}</strong>
+                             </div>`;
+                    })
+                    .catch((error) => {
+                        console.error('Error saving drawn name:', error);
+                        alert('Error drawing name. Please try again.');
+                        drawButton.disabled = false;
+                    });
+            }, 2000);
+        });
+    }).catch((error) => {
+        console.error('Error fetching data:', error);
+        alert('Error drawing name. Please try again.');
+        drawButton.disabled = false;
+    });
+};
 
         function fetchAttendees() {
-            const attendeesDiv = document.getElementById('attendees');
-            const rsvpCountElem = document.getElementById('rsvpCount');
-            const attendeesRef = ref(database, 'attendees');
+    const attendeesDiv = document.getElementById('attendees');
+    const rsvpCountElem = document.getElementById('rsvpCount');
+    const santaCountElem = document.getElementById('santaCount');
+    
+    // Use get() instead of onValue
+    get(ref(database, 'attendees')).then((snapshot) => {
+        const attendeesData = snapshot.val();
+        attendeesDiv.innerHTML = '';
+        let rsvpCount = 0;
+        let santaCount = 0;
 
-            onValue(attendeesRef, (snapshot) => {
-                const attendeesData = snapshot.val();
-                attendeesDiv.innerHTML = ''; // Clear the previous list
-                let rsvpCount = 0;
-                let santaCount = 0;
+        if (attendeesData) {
+            for (const key in attendeesData) {
+                if (attendeesData[key].rsvp) {
+                    rsvpCount++;
+                    if (attendeesData[key].giftTo) santaCount++;
 
-                if (attendeesData) {
-                    for (const key in attendeesData) {
-                        if (attendeesData[key].rsvp) {
-                            rsvpCount++;
-                            if (attendeesData[key].giftTo) {
-                                santaCount++;
-                            }
-
-                            // Create attendee element
-                            const attendeeElem = document.createElement('div');
-                            attendeeElem.classList.add('attendee');
-
-                            const img = document.createElement('img');
-                            img.src = attendeesData[key].img || 'https://via.placeholder.com/60';
-                            img.alt = attendeesData[key].name || 'Attendee';
-
-                            const nameElem = document.createElement('p');
-                            nameElem.innerText = attendeesData[key].name || 'Anonymous';
-                            nameElem.style.margin = '5px 0';
-                            nameElem.style.color = '#fff';
-                            nameElem.style.textAlign = 'center';
-
-                            attendeeElem.appendChild(img);
-                            attendeeElem.appendChild(nameElem);
-                            attendeesDiv.appendChild(attendeeElem);
-                        }
-                    }
+                    const attendeeElem = document.createElement('div');
+                    attendeeElem.className = 'attendee d-inline-block m-2';
+                    
+                    attendeeElem.innerHTML = `
+                        <img src="${attendeesData[key].img || 'https://via.placeholder.com/60'}" 
+                             alt="${attendeesData[key].name || 'Attendee'}">
+                        <p class="mb-0 mt-1">${attendeesData[key].name || 'Anonymous'}</p>
+                    `;
+                    
+                    attendeesDiv.appendChild(attendeeElem);
                 }
-
-                rsvpCountElem.innerText = `${rsvpCount} people have RSVP'd Yes`;
-                if (santaCount > 0) {
-                    document.getElementById('santaCount').innerHTML = 
-                        `<div class="santa-count">${santaCount} Secret Santas are preparing their gifts! 🎁</div>`;
-                }
-            }, (error) => {
-                console.error('Error fetching attendees:', error);
-            });
+            }
         }
+
+        rsvpCountElem.textContent = `${rsvpCount} people have RSVP'd Yes`;
+        if (santaCount > 0) {
+            santaCountElem.style.display = 'block';
+            santaCountElem.textContent = `${santaCount} Secret Santa${santaCount !== 1 ? 's are' : ' is'} preparing their gift! 🎁`;
+        }
+    });
+}
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', () => {
