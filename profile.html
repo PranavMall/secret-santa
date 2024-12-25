@@ -380,44 +380,26 @@ window.drawSecretSanta = function() {
         return get(attendeesRef).then((snapshot) => {
             const attendees = snapshot.val();
             
-            // Create a map of who is giving gifts to whom
-            const giftAssignments = new Map();
-            Object.entries(attendees).forEach(([key, value]) => {
-                if (value.giftTo) {
-                    giftAssignments.set(key, value.giftTo);
+            // Get list of people already receiving gifts
+            const receivingGifts = new Set();
+            Object.values(attendees).forEach(person => {
+                if (person.giftTo) {
+                    receivingGifts.add(person.giftTo);
                 }
             });
 
-            // Filter available names with enhanced exclusion logic
+            // Filter available names
             const availableNames = Object.entries(attendees || {}).filter(([key, value]) => {
-                // Exclude self
-                if (key === userCode) return false;
-                
-                // Exclude spouse
-                if (spouseId && key === spouseId) return false;
-                
-                // Exclude those who already have a Secret Santa
-                if (value.giftTo) return false;
-                
-                // Only include people who RSVP'd yes
-                if (!value.rsvp) return false;
-
-                // Check if this person is already receiving a gift
-                const isAlreadyReceivingGift = Array.from(giftAssignments.values()).includes(key);
-                if (isAlreadyReceivingGift) return false;
-                
-                // Prevent cycles in gift-giving
-                let currentGiver = key;
-                const visited = new Set();
-                while (giftAssignments.has(currentGiver)) {
-                    if (visited.has(currentGiver)) return false;
-                    visited.add(currentGiver);
-                    currentGiver = giftAssignments.get(currentGiver);
-                    if (currentGiver === userCode) return false; // Would create a cycle
-                }
+                // Basic exclusions
+                if (key === userCode) return false;  // Can't give to self
+                if (spouseId && key === spouseId) return false;  // Can't give to spouse
+                if (!value.rsvp) return false;  // Must have RSVP'd yes
+                if (receivingGifts.has(key)) return false;  // Can't give to someone already receiving a gift
                 
                 return true;
             });
+
+            console.log('Available names:', availableNames.map(([_, v]) => v.name));
 
             if (availableNames.length === 0) {
                 drawButton.disabled = false;
